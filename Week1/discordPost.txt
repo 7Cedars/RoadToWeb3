@@ -1,0 +1,117 @@
+Hi everyone, 
+
+Here is my  submission for the Road to Web3 - Week 1. (And first blog post on mirror.xyz!)  I’ve really enjoyed this first week’s challenge and am looking forward to the completing the rest in the next two months or so. 
+
+Here are my reflections on the task, following the questions as posted on alchemy’s discord channel to structure my reflections. 
+
+1) Who are you, and what is your software development background?
+
+So this is Teije - I’m from the Netherlands but have been living in England for the last five years. I have a background in the social sciences and have worked with R and Python - but never as the main part of my academic work. 
+
+I decided to go into the solidity and blockchain community about two months ago, and have been learning since. I had no knowledge of solidity (or react/javascript) whatsoever before then.  
+
+2) Why did you want to complete this lesson?
+
+First of all, I decided to start alchemy’s Road to Web3 to strengthen my knowledge of solidity. I do have some knowledge of solidity by now, but thought it was best to start at the beginning of the track. 
+
+A second reason relates to community. I am starting to realise how much of learning solidity is actually also about becoming part of an online community. It’s something that does not quite come naturally to me: I prefer face to face interaction. It was great that the task included writing an online reflection. It was really great to read stories of others that are in a similar position as me. It makes it so much easier to give a online reflection myself and engage.
+
+3) When did you complete the project?
+
+October 31st. 
+
+4) What technologies did you use?
+
+The Open Zeppelin Smart Contract wizard and Remix. I used Inkscape to draw myself an NFT :) 
+
+5) What did you enjoy about the tutorial?
+
+The use of a wizard to create standardised (but still editable) smart contracts was an eye opener. It’s super easy to use, supports best practices and is a safe way to start building contracts. I will definitely use the Open Zeppelin (the wizard or their Github repository) constantly from now onward. 
+
+6) How do you think you can use this technology to build useful applications in the future? What are some specific example applications?
+
+Very similar to how it was used in this project: first create a basic contract through the Open Zeppelin Wizard or based on some example from their github page. Then adapt it to your own needs for your project. It seems like the only reasonably safe way to create a contract. 
+
+Example contracts can be pretty much anything: from building an NFT-like contract, to setting up a DAO or soulbound token. Any project remotely related to this, should start with template contracts.   
+
+There is a flip side to this though, especially for junior developers like me. To be able to make safe adaptations to template contracts, you do need to have detailed knowledge of how these contracts work. To get this knowledge, I do think it is necessary to have experience with building a contract from the ground up. In other words, I think that in a learning trajectory there is no alternative to having students also build their own contracts -- and letting them make and learn from their own mistakes.   
+
+7) Who would you recommend this project to?
+
+Anyone who is thinking about building on the blockchain. They need to know these wizards and best practices. 
+
+8) What is the Ethereum wallet address you would like to receive your PoK at?Here 
+
+0x1ABe345C38Abf38799Cc5248d747b4ec1B8429dE 
+
+9) The preview from Opensea:
+
+See at the top of this blog post. I thought it was fun to quickly create my own logo and use that as an NFT. Please don’t judge this submission on my design qualities!    
+
+10) The Contract address and code:
+
+The contract address on the Goerli testnet  is: 0x5b615ec4f0112150fc7085f651f8febfd38f1cc3
+
+The code: 
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts@4.7.3/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts@4.7.3/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts@4.7.3/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts@4.7.3/access/Ownable.sol";
+import "@openzeppelin/contracts@4.7.3/utils/Counters.sol";
+
+contract Cedars is ERC721, ERC721Enumerable, ERC721URIStorage {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+    mapping(address => uint256[]) public _tokenIdAddressMap;
+    uint256 MAX_SUPPLY = 100000;
+    uint8 MAX_IND_SUPPLY = 5; 
+
+    constructor() ERC721("7Cedars", "7C") {}
+
+    function safeMint(address to, string memory uri) public {
+        require(_tokenIdCounter.current() <= MAX_SUPPLY, "I'm sorry we reached the cap");
+        require(_tokenIdAddressMap[to].length < MAX_IND_SUPPLY, "I'm sorry you reached your individual cap"); 
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, uri);
+        _tokenIdAddressMap[to].push(tokenId);
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+}
+
+
