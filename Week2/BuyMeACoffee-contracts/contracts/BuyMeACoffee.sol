@@ -1,12 +1,12 @@
 //SPDX-License-Identifier: Unlicense
 // contracts/BuyMeACoffee.sol
-pragma solidity ^0.8.0;
+// NB: I do think that the update function for receiver address is rather.. naive. but hope its ok. 
 
-// Switch this to your own contract address once deployed, for bookkeeping!
-// Example Contract Address on Goerli: 0xDBa03676a2fBb6711CB652beF5B7416A53c1421D
+pragma solidity ^0.8.0;
 
 contract BuyMeACoffee {
     // Event to emit when a Memo is created.
+
     event NewMemo(
         address indexed from,
         uint256 timestamp,
@@ -25,6 +25,7 @@ contract BuyMeACoffee {
     // Address of contract deployer. Marked payable so that
     // we can withdraw to this address later.
     address payable owner;
+    address payable withdrawalAddress;
 
     // List of all memos received from coffee purchases.
     Memo[] memos;
@@ -33,6 +34,15 @@ contract BuyMeACoffee {
         // Store the address of the deployer as a payable address.
         // When we withdraw funds, we'll withdraw here.
         owner = payable(msg.sender);
+        withdrawalAddress = payable(msg.sender);
+    }
+    
+    /**
+     * @dev updates receiver address
+     */
+    function updateReceiver(address payable _newReceiver) public {
+        require(msg.sender == owner); 
+        withdrawalAddress = _newReceiver;
     }
 
     /**
@@ -72,6 +82,7 @@ contract BuyMeACoffee {
      * @dev send the entire balance stored in this contract to the owner
      */
     function withdrawTips() public {
-        require(owner.send(address(this).balance));
+        require(msg.sender == owner);
+        withdrawalAddress.transfer(address(this).balance);
     }
 }
